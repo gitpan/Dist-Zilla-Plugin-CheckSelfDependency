@@ -5,9 +5,9 @@ BEGIN {
   $Dist::Zilla::Plugin::CheckSelfDependency::AUTHORITY = 'cpan:ETHER';
 }
 {
-  $Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.001';
+  $Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.002';
 }
-# git description: e2b2103
+# git description: v0.001-6-g9d17dd8
 
 # ABSTRACT: Check if your distribution declares a dependency on itself
 # vim: set ts=8 sw=4 tw=78 et :
@@ -16,6 +16,7 @@ use Moose;
 with 'Dist::Zilla::Role::AfterBuild';
 use List::MoreUtils qw(any uniq);
 use Module::Metadata;
+use namespace::autoclean;
 
 sub after_build
 {
@@ -24,7 +25,11 @@ sub after_build
     my $prereqs = $self->zilla->prereqs->as_string_hash;
 
     # for now, we check all phases and types.
-    my @prereqs = uniq map { keys %$_ } map { values %$_ } values %$prereqs;
+    my @prereqs = uniq
+        map { keys %$_ }
+        map { values %$_ }
+        grep { defined }
+        @{$prereqs}{qw(configure build runtime test)};
 
     my $files = $self->zilla->find_files(':InstallModules');
 
@@ -59,7 +64,7 @@ Dist::Zilla::Plugin::CheckSelfDependency - Check if your distribution declares a
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -70,7 +75,7 @@ In your F<dist.ini>:
 =head1 DESCRIPTION
 
 This is a L<Dist::Zilla> plugin that runs in the I<after build> phase, which
-checks all of your module prerequisites (all phases, all types) to confirm
+checks all of your module prerequisites (all phases, all types except develop) to confirm
 that none of them refer to modules that are provided by this distribution.
 
 While some prereq providers (e.g. L<C<[AutoPrereqs]>|Dist::Zilla::Plugin::AutoPrereqs>)
@@ -79,10 +84,12 @@ generate code and also inject the prerequisites needed by that code, without
 regard to whether some of those modules might be provided by your dist.
 
 If such modules are found, the build fails.  To remedy the situation, remove
-the plugin that adds the prerequisite, or remove it with
+the plugin that adds the prerequisite, or remove the prerequisite itself with
 L<C<[RemovePrereqs]>|Dist::Zilla::Plugin::RemovePrereqs>. (Remember that
-plugin order is significant - you need to remove the prereq after it has been
+plugin order is significant -- you need to remove the prereq after it has been
 added.)
+
+=for Pod::Coverage after_build
 
 =head1 SUPPORT
 

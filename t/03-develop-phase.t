@@ -14,17 +14,17 @@ my $tzil = Builder->from_config(
             'source/dist.ini' => simple_ini(
                 'GatherDir',
                 'CheckSelfDependency',
-                [ 'Prereqs / RuntimeRequires' => { 'Foo::Bar' => '1.23' } ],
+                [ 'Prereqs / DevelopRequires' => { 'Foo::Bar' => '1.23' } ],
             ),
             path(qw(source lib Foo Bar.pm)) => "package Foo::Bar;\n1;\n",
         },
     },
 );
 
-like(
+is(
     exception { $tzil->build },
-    qr{Foo::Bar is listed as a prereq, but is also provided by this dist \(lib/Foo/Bar.pm\)!},
-    'build is aborted',
+    undef,
+    'build is not aborted',
 );
 
 done_testing;
