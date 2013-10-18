@@ -7,8 +7,8 @@ use warnings;
 
 BEGIN {
 my %configure_requires = (
-    'ExtUtils::MakeMaker' => '6.30',
     'Module::Build::Tiny' => '0.030',
+    'ExtUtils::MakeMaker' => '6.30',
 );
 
 my @missing = grep {
@@ -51,7 +51,7 @@ EOW
 }
 }
 
-use 5.006;
+use 5.008;
 
 use ExtUtils::MakeMaker 6.30;
 
@@ -71,7 +71,6 @@ my %WriteMakefileArgs = (
   "NAME" => "Dist::Zilla::Plugin::CheckSelfDependency",
   "PREREQ_PM" => {
     "Dist::Zilla::Role::AfterBuild" => 0,
-    "List::MoreUtils" => 0,
     "Module::Metadata" => 0,
     "Moose" => 0,
     "namespace::autoclean" => 0,
@@ -88,7 +87,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "if" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

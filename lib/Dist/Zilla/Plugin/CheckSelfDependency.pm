@@ -5,16 +5,15 @@ BEGIN {
   $Dist::Zilla::Plugin::CheckSelfDependency::AUTHORITY = 'cpan:ETHER';
 }
 {
-  $Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.002';
+  $Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.003';
 }
-# git description: v0.001-6-g9d17dd8
+# git description: v0.002-3-gf9f7f18
 
 # ABSTRACT: Check if your distribution declares a dependency on itself
 # vim: set ts=8 sw=4 tw=78 et :
 
 use Moose;
 with 'Dist::Zilla::Role::AfterBuild';
-use List::MoreUtils qw(any uniq);
 use Module::Metadata;
 use namespace::autoclean;
 
@@ -22,26 +21,28 @@ sub after_build
 {
     my $self = shift;
 
-    my $prereqs = $self->zilla->prereqs->as_string_hash;
-
-    # for now, we check all phases and types.
-    my @prereqs = uniq
+    my %prereqs = map { $_ => 1 }
         map { keys %$_ }
         map { values %$_ }
         grep { defined }
-        @{$prereqs}{qw(configure build runtime test)};
+        @{ $self->zilla->prereqs->as_string_hash }{qw(configure build runtime test)};
 
     my $files = $self->zilla->find_files(':InstallModules');
 
     my @errors;
     foreach my $file (@$files)
     {
-        my @packages = Module::Metadata->new_from_file($file->name)->packages_inside;
-        foreach my $prereq (@prereqs)
+        # TODO - encoding issues? for now, Dist::Zilla gives us the file
+        # content from disk as :raw, otherwise in "whatever"
+        my $content = $file->content;
+        open my $fh, '<', \$content or $self->log_fatal("cannot open scalar fh: $!");
+
+        my @packages = Module::Metadata->new_from_handle($fh, $file->name)->packages_inside;
+        foreach my $package (@packages)
         {
-            push @errors, $prereq . ' is listed as a prereq, but is also provided by this dist ('
+            push @errors, $package . ' is listed as a prereq, but is also provided by this dist ('
                     . $file->name . ')!'
-                if any { $prereq eq $_ } @packages;
+                if exists $prereqs{$package};
         }
     }
 
@@ -64,7 +65,7 @@ Dist::Zilla::Plugin::CheckSelfDependency - Check if your distribution declares a
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

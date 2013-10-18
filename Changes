@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-CheckSelfDependency
 
+0.003     2013-10-18 01:13:36Z (Karen Etheridge)
+          - properly handle .pm files that don't exist on disk yet (e.g.
+            ::Conflicts)
+
 0.002     2013-10-17 02:58:11Z (Karen Etheridge)
           - skip checking develop prereqs, (it is not horrible for a plugin or
             bundle to list itself as a develop prereq)

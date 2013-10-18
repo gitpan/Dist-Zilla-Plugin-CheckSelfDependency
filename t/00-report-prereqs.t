@@ -17,7 +17,6 @@ my @modules = qw(
   Dist::Zilla::Role::AfterBuild
   ExtUtils::MakeMaker
   File::Spec::Functions
-  List::MoreUtils
   List::Util
   Module::Build::Tiny
   Module::Metadata
