@@ -5,9 +5,9 @@ BEGIN {
   $Dist::Zilla::Plugin::CheckSelfDependency::AUTHORITY = 'cpan:ETHER';
 }
 {
-  $Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.003';
+  $Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.004';
 }
-# git description: v0.002-3-gf9f7f18
+# git description: v0.003-2-gf7cfe75
 
 # ABSTRACT: Check if your distribution declares a dependency on itself
 # vim: set ts=8 sw=4 tw=78 et :
@@ -32,10 +32,17 @@ sub after_build
     my @errors;
     foreach my $file (@$files)
     {
-        # TODO - encoding issues? for now, Dist::Zilla gives us the file
-        # content from disk as :raw, otherwise in "whatever"
-        my $content = $file->content;
-        open my $fh, '<', \$content or $self->log_fatal("cannot open scalar fh: $!");
+        # Dist::Zilla pre-5.0 gives us the file content from disk as :raw,
+        # otherwise we get it in its decoded form (characters)
+        my $binmode = Dist::Zilla->VERSION < 5
+            ? ''
+            : $file->encoding eq 'bytes' ? ':raw' : sprintf ':encoding(%s)', $file->encoding;
+
+        my $content = Dist::Zilla->VERSION < 5
+            ? $file->content
+            : $file->encoded_content;
+
+        open my $fh, '<'.$binmode, \$content or $self->log_fatal("cannot open scalar fh: $!");
 
         my @packages = Module::Metadata->new_from_handle($fh, $file->name)->packages_inside;
         foreach my $package (@packages)
@@ -55,7 +62,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =for :stopwords Karen Etheridge irc
 
@@ -65,7 +72,7 @@ Dist::Zilla::Plugin::CheckSelfDependency - Check if your distribution declares a
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

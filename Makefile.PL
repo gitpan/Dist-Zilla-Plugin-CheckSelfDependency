@@ -85,9 +85,10 @@ my %WriteMakefileArgs = (
     "Test::DZil" => 0,
     "Test::Fatal" => 0,
     "Test::More" => 0,
-    "if" => 0
+    "if" => 0,
+    "utf8" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }

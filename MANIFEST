@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README
+README.md
 dist.ini
 lib/Dist/Zilla/Plugin/CheckSelfDependency.pm
 t/00-report-prereqs.t
@@ -15,6 +16,7 @@ t/01-basic.t
 t/02-extra-modules.t
 t/03-develop-phase.t
 t/04-file-in-memory.t
+t/05-encoding.t
 weaver.ini
 xt/author/00-compile.t
 xt/author/pod-spell.t

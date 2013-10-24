@@ -29,6 +29,7 @@ my @modules = qw(
   namespace::autoclean
   perl
   strict
+  utf8
   warnings
 );
 
