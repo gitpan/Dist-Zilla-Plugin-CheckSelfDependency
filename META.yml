@@ -30,10 +30,10 @@ no_index:
 provides:
   Dist::Zilla::Plugin::CheckSelfDependency:
     file: lib/Dist/Zilla/Plugin/CheckSelfDependency.pm
-    version: 0.004
+    version: 0.005
 requires:
   Dist::Zilla::Role::AfterBuild: 0
-  Module::Metadata: 0
+  Module::Metadata: 1.000005
   Moose: 0
   namespace::autoclean: 0
   perl: 5.008
@@ -43,10 +43,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CheckSelfDependency
   homepage: https://github.com/karenetheridge/Dist-Zilla-Plugin-CheckSelfDependency
   repository: https://github.com/karenetheridge/Dist-Zilla-Plugin-CheckSelfDependency.git
-version: 0.004
+version: 0.005
 x_Dist_Zilla:
   perl:
-    version: 5.019004
+    version: 5.019005
   plugins:
     -
       class: Dist::Zilla::Plugin::Bootstrap::lib
@@ -285,11 +285,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       name: '@Author::ETHER/RunExtraTests'
-      version: 0.014
+      version: 0.013
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       name: '@Author::ETHER/ReadmeAnyFromPod'
-      version: 0.132973
+      version: 0.132970
     -
       class: Dist::Zilla::Plugin::MakeMaker::Fallback
       name: '@Author::ETHER/MakeMaker::Fallback'

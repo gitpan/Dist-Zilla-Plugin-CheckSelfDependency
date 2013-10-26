@@ -5,16 +5,16 @@ BEGIN {
   $Dist::Zilla::Plugin::CheckSelfDependency::AUTHORITY = 'cpan:ETHER';
 }
 {
-  $Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.004';
+  $Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.005';
 }
-# git description: v0.003-2-gf7cfe75
+# git description: v0.004-1-g5f1d814
 
 # ABSTRACT: Check if your distribution declares a dependency on itself
 # vim: set ts=8 sw=4 tw=78 et :
 
 use Moose;
 with 'Dist::Zilla::Role::AfterBuild';
-use Module::Metadata;
+use Module::Metadata 1.000005;
 use namespace::autoclean;
 
 sub after_build
@@ -72,7 +72,7 @@ Dist::Zilla::Plugin::CheckSelfDependency - Check if your distribution declares a
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

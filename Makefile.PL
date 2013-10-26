@@ -71,7 +71,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Dist::Zilla::Plugin::CheckSelfDependency",
   "PREREQ_PM" => {
     "Dist::Zilla::Role::AfterBuild" => 0,
-    "Module::Metadata" => 0,
+    "Module::Metadata" => "1.000005",
     "Moose" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
@@ -88,7 +88,7 @@ my %WriteMakefileArgs = (
     "if" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
