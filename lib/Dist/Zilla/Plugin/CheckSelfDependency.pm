@@ -1,18 +1,19 @@
 use strict;
 use warnings;
 package Dist::Zilla::Plugin::CheckSelfDependency;
+{
+  $Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.006';
+}
+# git description: v0.005-5-g8931952
+
 BEGIN {
   $Dist::Zilla::Plugin::CheckSelfDependency::AUTHORITY = 'cpan:ETHER';
 }
-{
-  $Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.005';
-}
-# git description: v0.004-1-g5f1d814
-
 # ABSTRACT: Check if your distribution declares a dependency on itself
 # vim: set ts=8 sw=4 tw=78 et :
 
 use Moose;
+use Dist::Zilla 5;
 with 'Dist::Zilla::Role::AfterBuild';
 use Module::Metadata 1.000005;
 use namespace::autoclean;
@@ -26,30 +27,35 @@ sub after_build
         map { values %$_ }
         grep { defined }
         @{ $self->zilla->prereqs->as_string_hash }{qw(configure build runtime test)};
+    my %develop_prereqs = map { $_ => 1 }
+        map { keys %$_ }
+        map { values %$_ }
+        grep { defined }
+        $self->zilla->prereqs->as_string_hash->{develop};
 
-    my $files = $self->zilla->find_files(':InstallModules');
+    my $provides = $self->zilla->distmeta->{provides};  # copy, to avoid autovivifying
 
     my @errors;
-    foreach my $file (@$files)
+    foreach my $file (@{$self->zilla->files})
     {
-        # Dist::Zilla pre-5.0 gives us the file content from disk as :raw,
-        # otherwise we get it in its decoded form (characters)
-        my $binmode = Dist::Zilla->VERSION < 5
-            ? ''
-            : $file->encoding eq 'bytes' ? ':raw' : sprintf ':encoding(%s)', $file->encoding;
+        next if $file->name !~ /\.pm$/;
 
-        my $content = Dist::Zilla->VERSION < 5
-            ? $file->content
-            : $file->encoded_content;
+        $self->log_fatal(sprintf('Could not decode %s: %s', $file->name, $file->added_by))
+            if $file->encoding eq 'bytes';
 
-        open my $fh, '<'.$binmode, \$content or $self->log_fatal("cannot open scalar fh: $!");
+        open my $fh, sprintf('<:encoding(%s)', $file->encoding), \$file->encoded_content
+            or $self->log_fatal("cannot open scalar fh: $!");
 
         my @packages = Module::Metadata->new_from_handle($fh, $file->name)->packages_inside;
         foreach my $package (@packages)
         {
-            push @errors, $package . ' is listed as a prereq, but is also provided by this dist ('
+            if (exists $prereqs{$package}
+                or (exists $develop_prereqs{$package}
+                    and not exists $provides->{$package}))
+            {
+                push @errors, $package . ' is listed as a prereq, but is also provided by this dist ('
                     . $file->name . ')!'
-                if exists $prereqs{$package};
+            }
         }
     }
 
@@ -64,7 +70,7 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Karen Etheridge irc
+=for :stopwords Karen Etheridge indexable irc
 
 =head1 NAME
 
@@ -72,7 +78,7 @@ Dist::Zilla::Plugin::CheckSelfDependency - Check if your distribution declares a
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -82,9 +88,17 @@ In your F<dist.ini>:
 
 =head1 DESCRIPTION
 
+=for Pod::Coverage after_build
+
 This is a L<Dist::Zilla> plugin that runs in the I<after build> phase, which
 checks all of your module prerequisites (all phases, all types except develop) to confirm
-that none of them refer to modules that are provided by this distribution.
+that none of them refer to modules that are B<provided> by this distribution
+(that is, the metadata declares the module is indexable).
+
+In addition, all modules B<in> the distribution are checked against all module
+prerequisites (all phases, all types B<including> develop). Thus, it is
+possible to ship a L<Dist::Zilla> plugin and use (depend on) yourself, but
+errors such as declaring a dependency on C<inc::HelperPlugin> are still caught.
 
 While some prereq providers (e.g. L<C<[AutoPrereqs]>|Dist::Zilla::Plugin::AutoPrereqs>)
 do not inject dependencies found internally, there are many plugins that
@@ -96,8 +110,6 @@ the plugin that adds the prerequisite, or remove the prerequisite itself with
 L<C<[RemovePrereqs]>|Dist::Zilla::Plugin::RemovePrereqs>. (Remember that
 plugin order is significant -- you need to remove the prereq after it has been
 added.)
-
-=for Pod::Coverage after_build
 
 =head1 SUPPORT
 

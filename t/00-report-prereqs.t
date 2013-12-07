@@ -14,7 +14,9 @@ use List::Util qw/max/;
 my @modules = qw(
   CPAN::Meta
   CPAN::Meta::Requirements
+  Dist::Zilla
   Dist::Zilla::Role::AfterBuild
+  Dist::Zilla::Role::MetaProvider
   ExtUtils::MakeMaker
   File::Spec::Functions
   List::Util
