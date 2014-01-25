@@ -1,22 +1,37 @@
 use strict;
 use warnings;
 package Dist::Zilla::Plugin::CheckSelfDependency;
-{
-  $Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.006';
-}
-# git description: v0.005-5-g8931952
-
 BEGIN {
   $Dist::Zilla::Plugin::CheckSelfDependency::AUTHORITY = 'cpan:ETHER';
 }
+# git description: v0.006-3-g63d6261
+$Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.007';
 # ABSTRACT: Check if your distribution declares a dependency on itself
 # vim: set ts=8 sw=4 tw=78 et :
 
 use Moose;
 use Dist::Zilla 5;
-with 'Dist::Zilla::Role::AfterBuild';
+with 'Dist::Zilla::Role::AfterBuild',
+    'Dist::Zilla::Role::FileFinderUser' => {
+        default_finders => [ ':InstallModules' ],
+    },
+;
 use Module::Metadata 1.000005;
 use namespace::autoclean;
+
+around dump_config => sub
+{
+    my $orig = shift;
+    my $self = shift;
+
+    my $config = $self->$orig;
+
+    $config->{'' . __PACKAGE__} = {
+        finder => $self->finder,
+    };
+
+    return $config;
+};
 
 sub after_build
 {
@@ -36,10 +51,10 @@ sub after_build
     my $provides = $self->zilla->distmeta->{provides};  # copy, to avoid autovivifying
 
     my @errors;
-    foreach my $file (@{$self->zilla->files})
+    # when 'provides' data is mandatory, we will rely on what it says -
+    # but for now, we will check our modules explicitly for provided packages.
+    foreach my $file (@{$self->found_files})
     {
-        next if $file->name !~ /\.pm$/;
-
         $self->log_fatal(sprintf('Could not decode %s: %s', $file->name, $file->added_by))
             if $file->encoding eq 'bytes';
 
@@ -70,7 +85,7 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Karen Etheridge indexable irc
+=for :stopwords Karen Etheridge indexable FileFinder irc
 
 =head1 NAME
 
@@ -78,7 +93,7 @@ Dist::Zilla::Plugin::CheckSelfDependency - Check if your distribution declares a
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -110,6 +125,24 @@ the plugin that adds the prerequisite, or remove the prerequisite itself with
 L<C<[RemovePrereqs]>|Dist::Zilla::Plugin::RemovePrereqs>. (Remember that
 plugin order is significant -- you need to remove the prereq after it has been
 added.)
+
+This plugin accepts the following options:
+
+=over 4
+
+=item * C<finder>
+
+This is the name of a L<FileFinder|Dist::Zilla::Role::FileFinder> for finding
+modules to check.  The default value is C<:InstallModules>; this option can be
+used more than once.
+
+Other predefined finders are listed in
+L<Dist::Zilla::Role::FileFinderUser/default_finders>.
+You can define your own with the
+L<[FileFinder::ByName]|Dist::Zilla::Plugin::FileFinder::ByName> and
+L<[FileFinder::Filter]|Dist::Zilla::Plugin::FileFinder::Filter> plugins.
+
+=back
 
 =head1 SUPPORT
 
