@@ -1,32 +1,28 @@
 use strict;
 use warnings;
 package Dist::Zilla::Plugin::CheckSelfDependency;
-BEGIN {
-  $Dist::Zilla::Plugin::CheckSelfDependency::AUTHORITY = 'cpan:ETHER';
-}
-# git description: v0.006-3-g63d6261
-$Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.007';
+# git description: v0.007-16-g646759c
+$Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.008';
 # ABSTRACT: Check if your distribution declares a dependency on itself
+# KEYWORDS: plugin validate distribution prerequisites dependencies modules
 # vim: set ts=8 sw=4 tw=78 et :
 
 use Moose;
-use Dist::Zilla 5;
 with 'Dist::Zilla::Role::AfterBuild',
     'Dist::Zilla::Role::FileFinderUser' => {
         default_finders => [ ':InstallModules' ],
     },
 ;
 use Module::Metadata 1.000005;
+use CPAN::Meta::Requirements;
 use namespace::autoclean;
 
 around dump_config => sub
 {
-    my $orig = shift;
-    my $self = shift;
-
+    my ($orig, $self) = @_;
     my $config = $self->$orig;
 
-    $config->{'' . __PACKAGE__} = {
+    $config->{+__PACKAGE__} = {
         finder => $self->finder,
     };
 
@@ -42,11 +38,10 @@ sub after_build
         map { values %$_ }
         grep { defined }
         @{ $self->zilla->prereqs->as_string_hash }{qw(configure build runtime test)};
-    my %develop_prereqs = map { $_ => 1 }
-        map { keys %$_ }
-        map { values %$_ }
-        grep { defined }
-        $self->zilla->prereqs->as_string_hash->{develop};
+
+    my $develop_prereqs = $self->zilla->prereqs->cpan_meta_prereqs
+        ->merged_requirements(['develop'], [qw(requires recommends suggests)]);
+    my $develop_prereqs_hash = $develop_prereqs->as_string_hash;
 
     my $provides = $self->zilla->distmeta->{provides};  # copy, to avoid autovivifying
 
@@ -56,20 +51,37 @@ sub after_build
     foreach my $file (@{$self->found_files})
     {
         $self->log_fatal(sprintf('Could not decode %s: %s', $file->name, $file->added_by))
-            if $file->encoding eq 'bytes';
+            if $file->can('encoding') and $file->encoding eq 'bytes';
 
-        open my $fh, sprintf('<:encoding(%s)', $file->encoding), \$file->encoded_content
-            or $self->log_fatal("cannot open scalar fh: $!");
+        my $fh;
+        ($file->can('encoding')
+            ? open $fh, sprintf('<:encoding(%s)', $file->encoding), \$file->encoded_content
+            : open $fh, '<', \$file->content)
+                or $self->log_fatal('cannot open handle to ' . $file->name . ' content: ' . $!);
 
         my @packages = Module::Metadata->new_from_handle($fh, $file->name)->packages_inside;
         foreach my $package (@packages)
         {
             if (exists $prereqs{$package}
-                or (exists $develop_prereqs{$package}
+                or (exists $develop_prereqs_hash->{$package}
+                    # you can only have a develop prereq on yourself if you
+                    # use 'provides' metadata - so we're darned sure we
+                    # matched up the right module names
                     and not exists $provides->{$package}))
             {
                 push @errors, $package . ' is listed as a prereq, but is also provided by this dist ('
-                    . $file->name . ')!'
+                    . $file->name . ')!';
+                next;
+            }
+
+            next if not exists $develop_prereqs_hash->{$package};
+
+            my $version = $provides ? $provides->{$package}{version} : $self->zilla->version;
+            if (not $develop_prereqs->accepts_module($package => $version))
+            {
+                push @errors, "$package $develop_prereqs_hash->{$package} is listed as a develop prereq, "
+                    . 'but this dist doesn\'t provide that version ('
+                    . $file->name . ' only has ' . $version . ')!';
             }
         }
     }
@@ -85,15 +97,13 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Karen Etheridge indexable FileFinder irc
-
 =head1 NAME
 
 Dist::Zilla::Plugin::CheckSelfDependency - Check if your distribution declares a dependency on itself
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -104,6 +114,8 @@ In your F<dist.ini>:
 =head1 DESCRIPTION
 
 =for Pod::Coverage after_build
+
+=for stopwords indexable
 
 This is a L<Dist::Zilla> plugin that runs in the I<after build> phase, which
 checks all of your module prerequisites (all phases, all types except develop) to confirm
@@ -119,6 +131,7 @@ While some prereq providers (e.g. L<C<[AutoPrereqs]>|Dist::Zilla::Plugin::AutoPr
 do not inject dependencies found internally, there are many plugins that
 generate code and also inject the prerequisites needed by that code, without
 regard to whether some of those modules might be provided by your dist.
+This problem is particularly acute when packaging low-level toolchain distributions.
 
 If such modules are found, the build fails.  To remedy the situation, remove
 the plugin that adds the prerequisite, or remove the prerequisite itself with
@@ -126,11 +139,11 @@ L<C<[RemovePrereqs]>|Dist::Zilla::Plugin::RemovePrereqs>. (Remember that
 plugin order is significant -- you need to remove the prereq after it has been
 added.)
 
-This plugin accepts the following options:
+=head1 CONFIGURATION OPTIONS
 
-=over 4
+=head2 C<finder>
 
-=item * C<finder>
+=for stopwords FileFinder
 
 This is the name of a L<FileFinder|Dist::Zilla::Role::FileFinder> for finding
 modules to check.  The default value is C<:InstallModules>; this option can be
@@ -142,9 +155,9 @@ You can define your own with the
 L<[FileFinder::ByName]|Dist::Zilla::Plugin::FileFinder::ByName> and
 L<[FileFinder::Filter]|Dist::Zilla::Plugin::FileFinder::Filter> plugins.
 
-=back
-
 =head1 SUPPORT
+
+=for stopwords irc
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CheckSelfDependency>
 (or L<bug-Dist-Zilla-Plugin-CheckSelfDependency@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-CheckSelfDependency@rt.cpan.org>).

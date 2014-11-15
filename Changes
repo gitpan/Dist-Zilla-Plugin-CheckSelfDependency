@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-CheckSelfDependency
 
+0.008     2014-11-15 08:34:49Z
+          - drop prereq requirement on Dist::Zilla 5.x
+          - check against the version being required, not just the module,
+            when this is relevant (for develop prereqs)
+
 0.007     2014-01-25 03:20:52Z
           - now using a filefinder to find all modules to check -- now only
             checking files in lib/ by default

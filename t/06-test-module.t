@@ -11,7 +11,7 @@ my $tzil = Builder->from_config(
     { dist_root => 't/does_not_exist' },
     {
         add_files => {
-            'source/dist.ini' => simple_ini(
+            path(qw(source dist.ini)) => simple_ini(
                 'GatherDir',
                 'CheckSelfDependency',
                 [ 'Prereqs / RuntimeRequires' => { 'Foo::Bar' => '1.23' } ],
@@ -22,11 +22,16 @@ my $tzil = Builder->from_config(
     },
 );
 
+$tzil->chrome->logger->set_debug(1);
 is(
     exception { $tzil->build },
     undef,
     'build is is not aborted',
 );
 
-done_testing;
+ok(!exists $tzil->distmeta->{provides}, 'provides field was not autovivified in distmeta');
 
+diag 'got log messages: ', explain $tzil->log_messages
+    if not Test::Builder->new->is_passing;
+
+done_testing;

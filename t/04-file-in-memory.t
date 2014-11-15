@@ -11,7 +11,7 @@ my $tzil = Builder->from_config(
     { dist_root => 't/does_not_exist' },
     {
         add_files => {
-            'source/dist.ini' => simple_ini(
+            path(qw(source dist.ini)) => simple_ini(
                 'GatherDir',
                 'CheckSelfDependency',
                 [ GenerateFile => source => {
@@ -24,10 +24,16 @@ my $tzil = Builder->from_config(
     },
 );
 
+$tzil->chrome->logger->set_debug(1);
 like(
     exception { $tzil->build },
     qr{Foo::Bar is listed as a prereq, but is also provided by this dist \(lib/Foo/Bar.pm\)!},
     'build is aborted',
 );
+
+ok(!exists $tzil->distmeta->{provides}, 'provides field was not autovivified in distmeta');
+
+diag 'got log messages: ', explain $tzil->log_messages
+    if not Test::Builder->new->is_passing;
 
 done_testing;
