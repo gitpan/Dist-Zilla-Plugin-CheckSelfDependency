@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.079'
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.080'
                                       },
                       'requires' => {
                                       'Dist::Zilla' => '5',
@@ -101,6 +101,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'CPAN::Meta::Prereqs' => '2.132830',
                                       'CPAN::Meta::Requirements' => '0',
                                       'Dist::Zilla::Plugin::MetaResources' => '4.300039',
                                       'Dist::Zilla::Role::AfterBuild' => '0',

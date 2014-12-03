@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-CheckSelfDependency
 
+0.009     2014-12-03 02:07:51Z
+          - increase minimum required version of CPAN::Meta::Prereqs (broken
+            in 0.008)
+
 0.008     2014-11-15 08:34:49Z
           - drop prereq requirement on Dist::Zilla 5.x
           - check against the version being required, not just the module,

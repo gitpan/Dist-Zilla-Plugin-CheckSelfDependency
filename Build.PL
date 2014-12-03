@@ -78,12 +78,13 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "Dist-Zilla-Plugin-CheckSelfDependency",
-      "dist_version" => "0.008",
+      "dist_version" => "0.009",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::CheckSelfDependency",
       "recommends" => {},
       "recursive_test_files" => 1,
       "requires" => {
+        "CPAN::Meta::Prereqs" => "2.132830",
         "CPAN::Meta::Requirements" => 0,
         "Dist::Zilla::Plugin::MetaResources" => "4.300039",
         "Dist::Zilla::Role::AfterBuild" => 0,

@@ -18,7 +18,7 @@ configure_requires:
   Module::Build::Tiny: '0.039'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
 keywords:
   - plugin
   - validate
@@ -38,8 +38,9 @@ no_index:
 provides:
   Dist::Zilla::Plugin::CheckSelfDependency:
     file: lib/Dist/Zilla/Plugin/CheckSelfDependency.pm
-    version: '0.008'
+    version: '0.009'
 requires:
+  CPAN::Meta::Prereqs: '2.132830'
   CPAN::Meta::Requirements: '0'
   Dist::Zilla::Plugin::MetaResources: '4.300039'
   Dist::Zilla::Role::AfterBuild: '0'
@@ -56,7 +57,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CheckSelfDependency
   homepage: https://github.com/karenetheridge/Dist-Zilla-Plugin-CheckSelfDependency
   repository: https://github.com/karenetheridge/Dist-Zilla-Plugin-CheckSelfDependency.git
-version: '0.008'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.021005'
@@ -89,7 +90,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@Author::ETHER/Git::NextVersion'
-      version: '2.025'
+      version: '2.028'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -101,7 +102,7 @@ x_Dist_Zilla:
           phase: build
           skip: []
       name: '@Author::ETHER/stale modules, build'
-      version: '0.030'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -112,7 +113,7 @@ x_Dist_Zilla:
           phase: release
           skip: []
       name: '@Author::ETHER/stale modules, release'
-      version: '0.030'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::ETHER/ExecDir'
@@ -149,7 +150,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@Author::ETHER/Git::GatherDir'
-      version: '2.025'
+      version: '2.028'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::ETHER/MetaYAML'
@@ -222,7 +223,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::EOL:
           filename: xt/author/eol.t
       name: '@Author::ETHER/Test::EOL'
-      version: '0.15'
+      version: '0.16'
     -
       class: Dist::Zilla::Plugin::MetaTests
       name: '@Author::ETHER/MetaTests'
@@ -383,7 +384,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::AuthorityFromModule:
           module: Dist::Zilla::Plugin::CheckSelfDependency
       name: '@Author::ETHER/AuthorityFromModule'
-      version: '0.003'
+      version: '0.004'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@Author::ETHER/Authority'
@@ -492,7 +493,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
       name: '@Author::ETHER/RunExtraTests'
-      version: '0.024'
+      version: '0.025'
     -
       class: Dist::Zilla::Plugin::CheckSelfDependency
       config:
@@ -508,7 +509,7 @@ x_Dist_Zilla:
           run:
             - "bash -c \"if [[ `dirname %d` != .build ]]; then test -e .ackrc && grep -q -- '--ignore-dir=%d' .ackrc || echo '--ignore-dir=%d' >> .ackrc; fi\""
       name: '@Author::ETHER/.ackrc'
-      version: '0.027'
+      version: '0.028'
     -
       class: Dist::Zilla::Plugin::Run::AfterBuild
       config:
@@ -516,7 +517,7 @@ x_Dist_Zilla:
           eval:
             - "if ('%d' =~ /^%n-[.[:xdigit:]]+$/) { unlink '.latest'; symlink '%d', '.latest'; }"
       name: '@Author::ETHER/.latest'
-      version: '0.027'
+      version: '0.028'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@Author::ETHER/CheckStrictVersion'
@@ -533,7 +534,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@Author::ETHER/initial check'
-      version: '2.025'
+      version: '2.028'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
@@ -555,7 +556,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@Author::ETHER/CheckPrereqsIndexed'
-      version: '0.012'
+      version: '0.013'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::ETHER/TestRelease'
@@ -572,11 +573,11 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@Author::ETHER/after tests'
-      version: '2.025'
+      version: '2.028'
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: '@Author::ETHER/CheckIssues'
-      version: '0.004'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::ETHER/UploadToCPAN'
@@ -598,7 +599,7 @@ x_Dist_Zilla:
           eval:
             - "unlink 'README.md'"
       name: '@Author::ETHER/remove old READMEs'
-      version: '0.027'
+      version: '0.028'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -619,21 +620,21 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@Author::ETHER/Git::Commit'
-      version: '2.025'
+      version: '2.028'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
         Dist::Zilla::Plugin::Git::Tag:
           branch: ~
           signed: 0
-          tag: v0.008
+          tag: v0.009
           tag_format: v%v%t
           tag_message: v%v%t
           time_zone: local
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@Author::ETHER/Git::Tag'
-      version: '2.025'
+      version: '2.028'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       name: '@Author::ETHER/GitHub::Update'
@@ -648,14 +649,14 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
       name: '@Author::ETHER/Git::Push'
-      version: '2.025'
+      version: '2.028'
     -
       class: Dist::Zilla::Plugin::Run::AfterRelease
       config:
         Dist::Zilla::Plugin::Run::Role::Runner:
           run: REDACTED
       name: '@Author::ETHER/install release'
-      version: '0.027'
+      version: '0.028'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::ETHER/ConfirmRelease'
@@ -723,7 +724,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::VerifyPhases
       name: '@Author::ETHER/PHASE VERIFICATION'
-      version: '0.008'
+      version: '0.009'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:

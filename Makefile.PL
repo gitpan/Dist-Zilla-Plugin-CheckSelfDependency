@@ -75,6 +75,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Dist::Zilla::Plugin::CheckSelfDependency",
   "PREREQ_PM" => {
+    "CPAN::Meta::Prereqs" => "2.132830",
     "CPAN::Meta::Requirements" => 0,
     "Dist::Zilla::Plugin::MetaResources" => "4.300039",
     "Dist::Zilla::Role::AfterBuild" => 0,
@@ -97,13 +98,14 @@ my %WriteMakefileArgs = (
     "if" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
+  "CPAN::Meta::Prereqs" => "2.132830",
   "CPAN::Meta::Requirements" => 0,
   "Dist::Zilla::Plugin::MetaResources" => "4.300039",
   "Dist::Zilla::Role::AfterBuild" => 0,

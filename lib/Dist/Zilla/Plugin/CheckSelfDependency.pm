@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 package Dist::Zilla::Plugin::CheckSelfDependency;
-# git description: v0.007-16-g646759c
-$Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.008';
+# git description: v0.008-1-gd3ef703
+$Dist::Zilla::Plugin::CheckSelfDependency::VERSION = '0.009';
 # ABSTRACT: Check if your distribution declares a dependency on itself
 # KEYWORDS: plugin validate distribution prerequisites dependencies modules
 # vim: set ts=8 sw=4 tw=78 et :
@@ -14,6 +14,7 @@ with 'Dist::Zilla::Role::AfterBuild',
     },
 ;
 use Module::Metadata 1.000005;
+use CPAN::Meta::Prereqs 2.132830;   # for merged_requirements
 use CPAN::Meta::Requirements;
 use namespace::autoclean;
 
@@ -103,7 +104,7 @@ Dist::Zilla::Plugin::CheckSelfDependency - Check if your distribution declares a
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
