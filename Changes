@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-CheckSelfDependency
 
+0.010     2015-01-03 20:48:28Z
+          - bump Module::Metdata prereq for $VERSION parsing (RT#101095)
+
 0.009     2014-12-03 02:07:51Z
           - increase minimum required version of CPAN::Meta::Prereqs (broken
             in 0.008)
